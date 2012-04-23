@@ -1,0 +1,3 @@
+[submodule "openmultimedia.jwplayer-plugin"]
+	path = openmultimedia.jwplayer-plugin
+	url = git-KgDesignes@pl5.projectlocker.com:OpenMultimedia_JwplayerPlugin.git
