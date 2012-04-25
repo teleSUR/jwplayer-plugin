@@ -13,35 +13,43 @@
 
 OPENMULTIMEDIA_USERVARS_FILE="$OPENMULTIMEDIA_USERVARS_FILE"
 
-# Se requiere la ruta del bin de Flex SDK en el PATH
+# Se requiere la ruta del bin de Flex SDK v3.6 en el PATH
 # PATH=ruta/al/flex/sdk:$PATH
 
 ### Variables específicas del script
 
+openmultimedia_plugin_submodule_path='./openmultimedia.jwplayer-plugin'
 openmultimedia_plugin_version='1.0'
-debug=0
+
+telesur_plugin_version='1.0'
+
+debug=1
+release=1
 
 ### Procesamiento de las opciones de linea de comandos
-
 while [ $1 ]
 do
     case $1 in
+        ## Indica un archivo personalizado de UserVars
+        '--uservars-file')
+            shift
+            OPENMULTIMEDIA_USERVARS_FILE="$1"
+        ;;
 
-    '--uservars-file')
-		shift
-        OPENMULTIMEDIA_USERVARS_FILE="$1"
-    ;;
+        ## No carga archivo de UserVars
+        '--no-uservars-file')
+            OPENMULTIMEDIA_USERVARS_FILE=''
+        ;;
 
-    '--no-uservars-file')
-        OPENMULTIMEDIA_USERVARS_FILE=''
-    ;;
+        ## No genera el SWF de Pruebas
+        '--no-debug')
+            debug=0
+        ;;
 
-	### Custom command-line switches
-
-	'--debug')
-		debug=1
-	;;
-
+        ## No genera el SWF de Producción
+        '--no-release')
+            release=0
+        ;;
     esac
 
     shift
@@ -63,30 +71,37 @@ cd "$DIR"
 
 ### Instrucciones de construccion
 
-echo "Compilando Componente SWF (debug)"
+if [ $debug -eq 1 ]
+then
+    echo "Compilando Componente SWF (debug)"
 
-mxmlc "./src/TelesurPlugin.as" \
--sp "./src/" \
--define=CONFIG::debug,true \
--o "./bin/telesur-debug.swf" \
--library-path+="./openmultimedia.jwplayer-plugin/lib" \
--library-path+="./openmultimedia.jwplayer-plugin/bin/openmultimedia-jwplugin-debug-1.0.swc" \
--load-externs "./openmultimedia.jwplayer-plugin/lib/jwplayer-5-classes.xml" \
--use-network=false
-echo ""
+    mxmlc "./src/TelesurPlugin.as" \
+    -source-path="./src/" \
+    -source-path+="${openmultimedia_plugin_submodule_path}/src/" \
+    -define=CONFIG::debug,true \
+    -output "./bin/multimedia_telesur-${telesur_plugin_version}.debug.swf" \
+    -library-path+="${openmultimedia_plugin_submodule_path}/lib" \
+    -load-externs "${openmultimedia_plugin_submodule_path}/lib/jwplayer-5-classes.xml" \
+    -use-network=false
 
-echo "Compilando Componente SWF (release)"
+    echo ""
+fi
 
-mxmlc "./src/TelesurPlugin.as" \
--sp "./src/" \
--define=CONFIG::debug,false \
--o "./bin/telesur.swf" \
--library-path+="./openmultimedia.jwplayer-plugin/lib" \
--library-path+="./openmultimedia.jwplayer-plugin/bin/openmultimedia-jwplugin-1.0.swc" \
--load-externs "./openmultimedia.jwplayer-plugin/lib/jwplayer-5-classes.xml" \
--use-network=false
+if [ $release -eq 1 ]
+then
+    echo "Compilando Componente SWF (release)"
 
-echo ""
+    mxmlc "./src/TelesurPlugin.as" \
+    -source-path="./src/" \
+    -source-path+="${openmultimedia_plugin_submodule_path}/src/" \
+    -define=CONFIG::debug,false \
+    -output "./bin/multimedia_telesur-${telesur_plugin_version}.swf" \
+    -library-path+="${openmultimedia_plugin_submodule_path}/lib" \
+    -load-externs "${openmultimedia_plugin_submodule_path}/lib/jwplayer-5-classes.xml" \
+    -use-network=false
+
+    echo ""
+fi
 
 echo "Compilacion terminada"
 
