@@ -10,6 +10,7 @@ package {
     }
 
     public class TelesurPlugin extends openmultimedia.jwplayer.PluginBase {
+
         private static const PLUGIN_ID:String = "multimedia_telesur";
 
         private static const MEDIO:Object = {
@@ -26,10 +27,10 @@ package {
                         host : 'streaming.tlsur.net',
                         path: '/blive/',
                         streams : {
-                            adaptive: { stream: 'ngrp:balta.stream_all' },
-                            original: { stream: 'ngrp:balta.stream' },
-                            p360: { stream: 'ngrp:balta.stream_360p' },
-                            p160: { stream: 'ngrp:balta.stream_160p' }
+                            adaptive: { bitrate: 'adaptive', stream: 'ngrp:balta.stream_all' },
+                            original: { bitrate: 798, stream: 'ngrp:balta.stream' },
+                            p360: { bitrate: 875, stream: 'ngrp:balta.stream_360p' },
+                            p160: { bitrate: 298, stream: 'ngrp:balta.stream_160p' }
                         },
                         protocols: {
                             rtmp: { port: 1935, manifest: '/manifest.f4m' },
@@ -112,6 +113,27 @@ package {
             this.id = PLUGIN_ID;
             this.medio = MEDIO;
             this.liveStreamingId = 'telesur-en-vivo';
+        }
+
+        override protected function get livePlaylist():* {
+            try {
+            if ( this.config.liveoptions.origin == 'web' ) {
+                return {
+                    title: 'teleSUR Live Stream',
+                    file: 'b2b-telesur-live-25f-4x3_2?ref=www.telesurtv.net&USER=Telesur_0001',
+                    streamer: 'rtmp://telesur.fms6.visionip.tv/live',
+                    bitrate: 2,
+                    image: this.config.liveoptions.thumbnail
+                };
+            }
+
+            return super.livePlaylist;
+            } catch (e:Error) {
+                CONFIG::debug {
+                Console.log('lol', e);
+                }
+                return '';
+            }
         }
 
 	override public function initPlugin(player:IPlayer, config:PluginConfig):void {
